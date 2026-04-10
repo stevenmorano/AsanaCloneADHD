@@ -1,0 +1,224 @@
+/* =========================================================
+   ADHD Task Engine — Design System
+   Philosophy: Low-friction dopamine engine. Dark, vibrant,
+   alive. Every pixel should feel like it rewards engagement.
+   ========================================================= */
+
+/* --- Google Fonts --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* --- CSS Custom Properties (Design Tokens) --- */
+:root {
+  /* Background layers */
+  --bg-base: #0d0f14;
+  --bg-surface: #161a24;
+  --bg-surface-hover: #1e2333;
+  --bg-elevated: #1e2333;
+  --bg-modal: rgba(13, 15, 20, 0.92);
+
+  /* Brand palette */
+  --color-primary: #7c6af7;
+  --color-primary-glow: rgba(124, 106, 247, 0.35);
+  --color-primary-soft: rgba(124, 106, 247, 0.12);
+
+  /* Life Zone accents */
+  --zone-general: #4ecdc4;
+  --zone-general-soft: rgba(78, 205, 196, 0.15);
+  --zone-shopping: #f7a26a;
+  --zone-shopping-soft: rgba(247, 162, 106, 0.15);
+  --zone-cleaning: #a78bfa;
+  --zone-cleaning-soft: rgba(167, 139, 250, 0.15);
+
+  /* Text */
+  --text-primary: #e8eaf0;
+  --text-secondary: #8892a4;
+  --text-muted: #4a5568;
+  --text-inverse: #0d0f14;
+
+  /* Health bar states */
+  --health-high: #4ade80;      /* 70-100%: vibrant green */
+  --health-mid: #fbbf24;       /* 30-69%: amber */
+  --health-low: #f87171;       /* 0-29%: red */
+  --health-low-glow: rgba(248, 113, 113, 0.4);
+
+  /* Quick Win button */
+  --quick-win: #ff6b6b;
+  --quick-win-glow: rgba(255, 107, 107, 0.4);
+  --quick-win-dark: #e05555;
+
+  /* Focus highlighter (active task glow) */
+  --focus-glow: #a78bfa;
+  --focus-glow-shadow: rgba(167, 139, 250, 0.45);
+  --focus-border: rgba(167, 139, 250, 0.8);
+
+  /* Borders and dividers */
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-soft: rgba(255, 255, 255, 0.1);
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+/* --- Reset & Base Styles --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Scrollbar Styling --- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* --- Utility Classes --- */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- Keyframe Animations --- */
+
+/* Health bar fill animation */
+@keyframes healthFill {
+  from { width: 0%; }
+}
+
+/* Glow pulse for active (focused) task */
+@keyframes focusPulse {
+  0%, 100% { box-shadow: 0 0 0 2px var(--focus-border), 0 0 16px var(--focus-glow-shadow); }
+  50% { box-shadow: 0 0 0 2px var(--focus-border), 0 0 28px var(--focus-glow-shadow), 0 0 48px rgba(167, 139, 250, 0.18); }
+}
+
+/* Quick Win button pulse */
+@keyframes quickWinPulse {
+  0%, 100% { box-shadow: 0 4px 20px var(--quick-win-glow), 0 0 0 0 var(--quick-win-glow); }
+  50% { box-shadow: 0 4px 32px var(--quick-win-glow), 0 0 0 8px rgba(255, 107, 107, 0); }
+}
+
+/* Red health bar blink */
+@keyframes healthBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Checkbox shatter/burst (Quick Win completion) */
+@keyframes checkShatter {
+  0% { transform: scale(1) rotate(0deg); opacity: 1; }
+  30% { transform: scale(1.4) rotate(-8deg); opacity: 1; }
+  60% { transform: scale(0.8) rotate(12deg); opacity: 0.7; }
+  100% { transform: scale(1.1) rotate(0deg); opacity: 1; }
+}
+
+/* Spawn animation for new task instances */
+@keyframes taskSpawn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Confetti particles */
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) rotateX(0) rotateZ(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(200px) rotateX(720deg) rotateZ(360deg);
+    opacity: 0;
+  }
+}
+
+/* Slide-in modal */
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Focus mode toggle glow */
+@keyframes toggleGlow {
+  0%, 100% { box-shadow: 0 0 8px var(--color-primary-glow); }
+  50% { box-shadow: 0 0 18px var(--color-primary-glow); }
+}

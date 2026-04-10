@@ -1,0 +1,459 @@
+/* ── TaskRow ────────────────────────────────────────────── */
+
+/* Column widths — must match MyTasks.css col-h-* and ProjectView.css pv-col-* */
+/* My Tasks (showProject=true):
+     health strip | check | name(flex) | due 108 | project 118 | section 114 | tags 110 | priority 76 */
+/* Project View (showProject=false):
+     health strip | check | name(flex) | due 108 | section 114 | tags 110 | priority 76 */
+
+/* ── Base row ── */
+.task-row {
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: transparent;
+  transition:
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+  position: relative;
+}
+
+.task-row:hover {
+  background: rgba(255,255,255,0.022);
+}
+
+.task-row--active {
+  background: var(--color-primary-soft) !important;
+  box-shadow: inset 0 0 0 1.5px var(--focus-border);
+}
+
+.task-row--completed {
+  opacity: 0.45;
+}
+
+.task-row--critical .task-row__health-strip {
+  animation: healthPulse 1.6s ease-in-out infinite;
+}
+
+.task-row--spawning {
+  animation: taskSpawn 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes healthPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+@keyframes taskSpawn {
+  from { opacity: 0; transform: translateX(-8px) scaleY(0.9); }
+  to   { opacity: 1; transform: translateX(0) scaleY(1); }
+}
+
+/* ── Health strip (4px left edge) ── */
+.task-row__health-strip {
+  width: 4px;
+  align-self: stretch;
+  flex-shrink: 0;
+  background: var(--health-color, transparent);
+  border-radius: 0 2px 2px 0;
+}
+
+/* ── Checkbox ── */
+.task-row__check {
+  width: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.task-row__check > span,
+.task-row__check > div {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+/* The visible circle — we use ::before pseudo on the button */
+.task-row__check::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-soft);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+  display: block;
+}
+
+.task-row__check:hover::before { border-color: var(--color-primary); }
+
+.task-row__check--done {
+  color: var(--color-primary);
+  cursor: default;
+}
+.task-row__check--done::before {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Remove duplicate circle when done (svg is inside) */
+.task-row__check svg { position: absolute; }
+
+.task-row__check--shattering {
+  animation: shatter 420ms ease-out forwards;
+}
+
+@keyframes shatter {
+  0%   { transform: scale(1); opacity: 1; }
+  40%  { transform: scale(1.4) rotate(5deg); }
+  100% { transform: scale(0) rotate(20deg); opacity: 0; }
+}
+
+/* ── Name Cell ── */
+.task-row__name-cell {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 12px 3px 0;
+}
+
+.task-row__name {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+  cursor: text;
+  border-radius: 3px;
+  padding: 1px 3px;
+  margin-left: -3px;
+  transition: background var(--transition-fast);
+}
+
+.task-row__name:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.task-row__name--done {
+  text-decoration: line-through;
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.task-row__name-input {
+  flex: 1;
+  background: var(--bg-elevated);
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: 0.875rem;
+  padding: 2px 6px;
+  outline: none;
+  width: 100%;
+  box-shadow: 0 0 0 3px rgba(124,106,247,0.15);
+}
+
+/* ── Focus / New pips ── */
+.task-row__focus-pip {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--focus-glow);
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+  animation: focusPipPulse 2s ease-in-out infinite;
+}
+
+@keyframes focusPipPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
+}
+
+.task-row__new-pip {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #34d399;
+  flex-shrink: 0;
+  animation: newPipBlink 1.2s ease-out 3;
+}
+
+@keyframes newPipBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ── Due Date Cell ── */
+.task-row__due-cell {
+  flex-shrink: 0;
+  width: 108px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding-right: 4px;
+}
+
+.task-row__due {
+  background: transparent;
+  border: none;
+  font-family: var(--font-family);
+  font-size: 0.78rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 5px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  outline: none;
+  transition: background var(--transition-fast);
+}
+
+.task-row__due:hover,
+.task-row__due--open { background: rgba(255,255,255,0.07); }
+
+.task-row__due--overdue   { color: #f87171; }
+.task-row__due--today     { color: #fb923c; }
+.task-row__due--tomorrow  { color: var(--text-secondary); }
+.task-row__due--future    { color: var(--text-muted); }
+.task-row__due--none      { color: transparent; }
+
+.task-row__due--placeholder {
+  color: transparent;
+  font-size: 0.72rem;
+  transition: color var(--transition-fast);
+}
+.task-row:hover .task-row__due--placeholder { color: var(--text-muted); }
+
+.task-row__overdue-icon { color: #f87171; flex-shrink: 0; }
+
+.task-row__rec-pip {
+  font-size: 0.68rem;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  flex-shrink: 0;
+}
+.task-row:hover .task-row__rec-pip { opacity: 0.45; }
+
+/* ── Project cell ─────────────────────────────────────── */
+.task-row__project-cell {
+  flex-shrink: 0;
+  width: 112px;
+  display: flex;
+  align-items: center;
+}
+
+/*
+  The project button looks like a colored chip (Asana style):
+  ● ProjectName
+  — pill with subtle background, no border chrome
+  — on hover: slightly brighter
+  — chevron only appears inside the button on hover
+*/
+.task-row__project-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  /* Asana-style: rounded pill, neutral dark bg */
+  background: rgba(255,255,255,0.08);
+  border: none;
+  border-radius: 6px;
+  padding: 2px 6px 2px 4px;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-size: 0.75rem;
+  font-weight: 500;
+  /* Fixed max to respect column */
+  max-width: 100%;
+  overflow: hidden;
+  outline: none;
+  transition: background var(--transition-fast);
+}
+
+.task-row__project-btn:hover,
+.task-row__project-btn.task-row__picker-btn--open {
+  background: rgba(255,255,255,0.15);
+}
+
+.task-row__project-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.task-row__project-name {
+  /* color set inline by project */
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* let flex grow so text is visible */
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Section cell ────────────────────────────────────── */
+.task-row__section-cell {
+  flex-shrink: 0;
+  width: 106px;
+  display: flex;
+  align-items: center;
+}
+
+/*
+  Section looks like plain muted text — no pill, no border.
+  Hover reveals a subtle tint so the user knows it's clickable.
+*/
+.task-row__section-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 5px 2px 3px;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  max-width: 100%;
+  overflow: hidden;
+  outline: none;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.task-row__section-btn:hover,
+.task-row__section-btn.task-row__picker-btn--open {
+  background: rgba(255,255,255,0.07);
+  color: var(--text-secondary);
+}
+
+.task-row__section-name {
+  font-size: 0.74rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.task-row__placeholder-text {
+  color: var(--text-muted);
+  opacity: 0.35;
+}
+
+/*
+  Chevron — hidden by default, only visible when the user
+  hovers that specific button (not just the row).
+  This avoids cluttering every cell with dropdown indicators.
+*/
+.task-row__chevron {
+  font-size: 0.5rem;
+  color: var(--text-muted);
+  opacity: 0;
+  flex-shrink: 0;
+  transition: opacity var(--transition-fast);
+  line-height: 1;
+}
+
+.task-row__project-btn:hover .task-row__chevron,
+.task-row__project-btn.task-row__picker-btn--open .task-row__chevron,
+.task-row__section-btn:hover .task-row__chevron,
+.task-row__section-btn.task-row__picker-btn--open .task-row__chevron {
+  opacity: 0.55;
+}
+
+/* ── Tags Cell ── */
+.task-row__tags {
+  flex-shrink: 0;
+  width: 110px;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 3px;
+  overflow: hidden;
+  align-items: center;
+  padding-right: 4px;
+}
+
+.task-row__tags--clickable {
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 2px 4px;
+  margin-left: -4px;
+  transition: background var(--transition-fast);
+}
+
+.task-row__tags--clickable:hover,
+.task-row__tags--clickable.task-row__picker-btn--open {
+  background: rgba(255,255,255,0.07);
+}
+
+.task-row__tag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  background: rgba(255,255,255,0.08);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.task-row__tag--quick {
+  background: rgba(251, 146, 60, 0.18);
+  color: #fb923c;
+}
+
+.task-row__tag-placeholder {
+  font-size: 0.68rem;
+  color: transparent;
+  transition: color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.task-row:hover .task-row__tag-placeholder { color: var(--text-muted); }
+
+/* ── Priority Cell ── */
+.task-row__priority {
+  flex-shrink: 0;
+  width: 76px;
+  padding-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.task-row__priority-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.priority--high   { background: rgba(239,68,68,0.18);  color: #f87171; }
+.priority--medium { background: rgba(234,179,8,0.18);  color: #facc15; }
+.priority--low    { background: rgba(148,163,184,0.12); color: #94a3b8; }
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .task-row__section-cell,
+  .task-row__tags          { display: none; }
+}
