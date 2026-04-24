@@ -68,7 +68,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   padding: 0 4px;
 }
 
@@ -78,6 +78,7 @@
 .pv-col--due      { width: 108px; flex-shrink: 0; }
 .pv-col--section  { width: 106px; flex-shrink: 0; }
 .pv-col--tags     { width: 110px; flex-shrink: 0; }
+.pv-col--type     { width: 90px;  flex-shrink: 0; padding-left: 4px; }
 .pv-col--priority { width: 76px;  flex-shrink: 0; padding-right: 12px; text-align: right; }
 
 /* ── Sections ── */
@@ -90,18 +91,61 @@
 }
 
 /* ── Section Header ── */
+.proj-section__header-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.proj-section__header-wrapper:hover .proj-section__actions {
+  opacity: 1;
+}
+
+.proj-section__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-right: 12px;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.proj-section__action-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.proj-section__action-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.proj-section__action-btn--delete:hover {
+  color: #ef4444;
+}
+
 .proj-section__header {
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
   padding: 10px 4px 6px;
   background: none;
   border: none;
   cursor: pointer;
   text-align: left;
   color: var(--text-primary);
-  border-bottom: 1px solid var(--border-subtle);
   transition: color var(--transition-fast);
 }
 
@@ -126,6 +170,68 @@
 .proj-section__name {
   font-size: var(--font-size-sm);
   font-weight: 700;
+}
+
+.proj-section__name-input {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  outline: none;
+  min-width: 150px;
+}
+
+.proj-section__name-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(124, 106, 247, 0.2);
+}
+
+.proj-section__delete-confirm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 12px;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  font-size: 0.8rem;
+  cursor: default;
+}
+
+.proj-section__delete-warn {
+  color: #fca5a5;
+  font-weight: 500;
+}
+
+.proj-section__delete-confirm button {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.proj-section__delete-confirm .confirm-btn {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+.proj-section__delete-confirm .confirm-btn:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+.proj-section__delete-confirm .cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .proj-section__count {

@@ -51,17 +51,22 @@ This is a living document. Agents must append or adjust sub-tasks as needed and 
     - [x] Project dropdown picker (auto-adjusts valid sections)
     - [x] Section dropdown picker (filtered by active project)
     - [x] Tags multi-select dropdown with instant creation
+  - [x] Advanced Section Management
+    - [x] Inline React Section Renaming (replaces system popups)
+    - [x] Section Reordering (Up/Down arrow handling)
+    - [x] Section Deletion with inline safety confirmation
+    - [x] Protected "General" bucket logic injected at index `0` for orphaned tasks
   - [x] Asana-aligned UI styling (Pill badges, mute text elements, hover interaction borders)
 
 ## Phase 4: Gamification & Sync Logic
-- [ ] Implement local state management and background engine for task updates.
-- [ ] Build Gamified "Upkeep Streaks" (Health Bars) for recurring tasks.
-- [ ] Integrate visual and audio micro-interactions (confetti, sounds, haptics) for Quick Wins.
+- [x] Implement local state management and background engine for task updates.
+- [x] Build Gamified "Upkeep Streaks" (Health Bars) for recurring tasks.
+- [x] Integrate visual and audio micro-interactions (confetti, sounds, haptics) for Quick Wins.
 - [ ] Set up differentiation between "Time Blocks" and "Quick Chores".
-- [ ] Link "Time Blocks" to Google Calendar API sync.
+- [ ] Link "Time Blocks" to Reclaim.ai integration via Sync Modal.
 
 ## Phase 5: Starter Pack Ecosystem
-- [ ] Build JSON payload export logic for life engines.
-- [ ] Build 1-click import system via URL payload or file drop.
-- [ ] Develop the user "opt-out" unpacking UI for imported Starter Packs.
-- [ ] Test end-to-end integration and polish the MVP user experience.
+- [x] Build JSON payload export logic for life engines.
+- [x] Build 1-click import system via URL payload or file drop.
+- [x] Develop the user "opt-out" unpacking UI for imported Starter Packs.
+- [x] Test end-to-end integration and polish the MVP user experience.

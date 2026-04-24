@@ -176,6 +176,7 @@ export function MyTasks({
         <div className="col-h col-h--project">Project</div>
         <div className="col-h col-h--section">Section</div>
         <div className="col-h col-h--tags">Tags</div>
+        <div className="col-h col-h--type">Type</div>
         <div className="col-h col-h--priority">Priority</div>
       </div>
 

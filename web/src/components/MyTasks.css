@@ -124,7 +124,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   padding: 0 4px;
 }
 
@@ -135,6 +135,7 @@
 .col-h--project  { width: 112px; flex-shrink: 0; }
 .col-h--section  { width: 106px; flex-shrink: 0; }
 .col-h--tags     { width: 110px; flex-shrink: 0; }
+.col-h--type     { width: 90px;  flex-shrink: 0; padding-left: 4px; }
 .col-h--priority { width: 76px;  flex-shrink: 0; padding-right: 12px; text-align: right; }
 
 /* ── Date Groups ── */

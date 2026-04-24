@@ -13,6 +13,9 @@ import { Sidebar } from './components/Sidebar';
 import { MyTasks } from './components/MyTasks';
 import { ProjectView } from './components/ProjectView';
 import { QuickWinButton } from './components/QuickWinButton';
+import { UnpackingModal } from './components/UnpackingModal';
+import { exportStarterPack } from './utils/starterPackUtils';
+import { useState, useRef } from 'react';
 import './App.css';
 
 function App() {
@@ -36,11 +39,52 @@ function App() {
     toggleSectionCollapse,
     addTask,
     addSection,
+    updateSection,
+    deleteSection,
+    moveSection,
     addProject,
     getProjectTasks,
+    importData,
   } = useAppState();
 
+  const [unpackPayload, setUnpackPayload] = useState(null);
+  const fileInputRef = useRef(null);
+
   const activeProject = projects.find((p) => p.id === activeView) ?? null;
+
+  function handleExportPack() {
+    exportStarterPack(projects, tasks);
+  }
+
+  function handleImportPackClick() {
+    fileInputRef.current?.click();
+  }
+
+  function handleFileChange(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const json = JSON.parse(event.target.result);
+        if (json.packId && json.lifeZones && json.tasks) {
+          setUnpackPayload(json);
+        } else {
+          alert('Invalid starter pack format.');
+        }
+      } catch (err) {
+        alert('Could not parse JSON file.');
+      }
+      e.target.value = null; // reset
+    };
+    reader.readAsText(file);
+  }
+
+  function handleExecuteImport(zonesToImport, tasksToImport) {
+    importData(zonesToImport, tasksToImport);
+    setUnpackPayload(null);
+  }
 
   return (
     <div className="app-shell">
@@ -50,6 +94,8 @@ function App() {
         activeView={activeView}
         onNavigate={navigateTo}
         onAddProject={addProject}
+        onExportPack={handleExportPack}
+        onImportPackClick={handleImportPackClick}
       />
 
       {/* Scrollable main content */}
@@ -81,6 +127,9 @@ function App() {
             onUpdate={updateTask}
             onAdd={addTask}
             onAddSection={addSection}
+            onUpdateSection={updateSection}
+            onDeleteSection={deleteSection}
+            onMoveSection={moveSection}
             projects={projects}
             allTags={allTags}
           />
@@ -93,6 +142,24 @@ function App() {
         onCompleteTask={completeTask}
         quickWinStreak={quickWinStreak}
       />
+
+      {/* Hidden File Input for JSON Imports */}
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        style={{ display: 'none' }} 
+        accept=".json"
+        onChange={handleFileChange}
+      />
+
+      {/* Unpacking Modal Overlay */}
+      {unpackPayload && (
+        <UnpackingModal
+          payload={unpackPayload}
+          onClose={() => setUnpackPayload(null)}
+          onImport={handleExecuteImport}
+        />
+      )}
     </div>
   );
 }

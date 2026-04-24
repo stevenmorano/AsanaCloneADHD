@@ -11,7 +11,7 @@
 
 import './Sidebar.css';
 
-export function Sidebar({ projects, activeView, onNavigate }) {
+export function Sidebar({ projects, activeView, onNavigate, onExportPack, onImportPackClick }) {
   function handleNewProject() {
     const name = prompt('Project name?');
     if (name?.trim()) {
@@ -76,6 +76,18 @@ export function Sidebar({ projects, activeView, onNavigate }) {
             </li>
           ))}
         </ul>
+      </div>
+
+      {/* ── Integrations / Sync (Phase 5) ── */}
+      <div className="sidebar__section sidebar__section--bottom">
+        <button className="sidebar__item sidebar__item--action" onClick={onImportPackClick}>
+          <span className="sidebar__item-icon" aria-hidden="true">📥</span>
+          <span className="sidebar__item-label">Import Starter Pack</span>
+        </button>
+        <button className="sidebar__item sidebar__item--action" onClick={onExportPack}>
+          <span className="sidebar__item-icon" aria-hidden="true">📤</span>
+          <span className="sidebar__item-label">Export Starter Pack</span>
+        </button>
       </div>
     </nav>
   );

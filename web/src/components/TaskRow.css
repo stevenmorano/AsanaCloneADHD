@@ -332,7 +332,7 @@
   cursor: pointer;
   font-family: var(--font-family);
   font-size: 0.74rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   max-width: 100%;
   overflow: hidden;
   outline: none;
@@ -429,6 +429,52 @@
 }
 
 .task-row:hover .task-row__tag-placeholder { color: var(--text-muted); }
+
+/* ── Type Cell (Time Block vs Quick Chore) ── */
+.task-row__type-cell {
+  flex-shrink: 0;
+  width: 90px;
+  display: flex;
+  align-items: center;
+}
+
+.task-row__type-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 2px 6px 2px 4px;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.task-row__type-btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-secondary);
+}
+
+.task-row__type-btn--block {
+  color: #60a5fa; /* Blue for calendaring */
+}
+
+.task-row__type-btn--chore {
+  /* Inherits standard colors */
+}
+
+.task-row__type-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.task-row__type-label {
+  padding-bottom: 1px;
+}
 
 /* ── Priority Cell ── */
 .task-row__priority {

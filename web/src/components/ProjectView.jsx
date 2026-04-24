@@ -130,9 +130,16 @@ export function ProjectView({
   onUpdate,
   onAdd,
   onAddSection,
+  onUpdateSection,
+  onDeleteSection,
+  onMoveSection,
   projects = [],
   allTags = [],
 }) {
+  const [editingSectionId, setEditingSectionId] = useState(null);
+  const [editSectionValue, setEditSectionValue] = useState("");
+  const [deletingSectionId, setDeletingSectionId] = useState(null);
+
   function getTasksForSection(sectionId) {
     return tasks.filter((t) => t.sectionId === sectionId);
   }
@@ -172,6 +179,7 @@ export function ProjectView({
         <div className="pv-col pv-col--due">Due date ↕</div>
         <div className="pv-col pv-col--section">Section</div>
         <div className="pv-col pv-col--tags">Tags</div>
+        <div className="pv-col pv-col--type">Type</div>
         <div className="pv-col pv-col--priority">Priority</div>
       </div>
 
@@ -189,24 +197,118 @@ export function ProjectView({
               className="proj-section"
               aria-labelledby={`section-${section.id}`}
             >
-              {/* Section header */}
-              <button
-                id={`section-${section.id}`}
-                className="proj-section__header"
-                onClick={() => onToggleSection(section.id)}
-                aria-expanded={!isCollapsed}
-              >
-                <span
-                  className={`proj-section__caret ${isCollapsed ? 'proj-section__caret--collapsed' : ''}`}
-                  aria-hidden="true"
+              {/* Section header container */}
+              <div className="proj-section__header-wrapper">
+                <div
+                  id={`section-${section.id}`}
+                  className="proj-section__header"
+                  onClick={() => onToggleSection(section.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onToggleSection(section.id);
+                    }
+                  }}
+                  aria-expanded={!isCollapsed}
+                  role="button"
+                  tabIndex="0"
                 >
-                  ▾
-                </span>
-                <span className="proj-section__name">{section.name}</span>
-                {incompleteCount > 0 && (
-                  <span className="proj-section__count">{incompleteCount}</span>
-                )}
-              </button>
+                  <span
+                    className={`proj-section__caret ${isCollapsed ? 'proj-section__caret--collapsed' : ''}`}
+                    aria-hidden="true"
+                  >
+                    ▾
+                  </span>
+
+                  {editingSectionId === section.id ? (
+                    <input
+                      type="text"
+                      className="proj-section__name-input"
+                      value={editSectionValue}
+                      onChange={(e) => setEditSectionValue(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => {
+                        e.stopPropagation();
+                        if (e.key === 'Enter') {
+                          if (editSectionValue.trim() !== section.name) {
+                            onUpdateSection?.(project.id, section.id, editSectionValue);
+                          }
+                          setEditingSectionId(null);
+                        }
+                        if (e.key === 'Escape') setEditingSectionId(null);
+                      }}
+                      autoFocus
+                      onBlur={() => {
+                        if (editSectionValue.trim() !== section.name) {
+                          onUpdateSection?.(project.id, section.id, editSectionValue);
+                        }
+                        setEditingSectionId(null);
+                      }}
+                    />
+                  ) : (
+                    <span className="proj-section__name">{section.name}</span>
+                  )}
+
+                  {incompleteCount > 0 && editingSectionId !== section.id && (
+                    <span className="proj-section__count">{incompleteCount}</span>
+                  )}
+
+                  {deletingSectionId === section.id && (
+                    <span className="proj-section__delete-confirm" onClick={(e) => e.stopPropagation()}>
+                      <span className="proj-section__delete-warn">Delete & move tasks to General?</span>
+                      <button className="confirm-btn" onClick={(e) => { e.stopPropagation(); onDeleteSection?.(project.id, section.id); setDeletingSectionId(null); }}>Yes</button>
+                      <button className="cancel-btn" onClick={(e) => { e.stopPropagation(); setDeletingSectionId(null); }}>No</button>
+                    </span>
+                  )}
+                </div>
+                <div className="proj-section__actions">
+                  {section.id !== 'general' && (
+                    <>
+                      <button
+                        className="proj-section__action-btn"
+                        onClick={(e) => { e.stopPropagation(); onMoveSection?.(project.id, section.id, 'up'); }}
+                        aria-label="Move Section Up"
+                        title="Move Up"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        className="proj-section__action-btn"
+                        onClick={(e) => { e.stopPropagation(); onMoveSection?.(project.id, section.id, 'down'); }}
+                        aria-label="Move Section Down"
+                        title="Move Down"
+                      >
+                        ↓
+                      </button>
+                      <button
+                        className="proj-section__action-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingSectionId(section.id);
+                          setEditSectionValue(section.name);
+                        }}
+                        aria-label="Edit Section Name"
+                        title="Edit Name"
+                      >
+                        ✎
+                      </button>
+                      {section.id !== 'inbox' && (
+                        <button
+                          className="proj-section__action-btn proj-section__action-btn--delete"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeletingSectionId(section.id);
+                          }}
+                          aria-label="Delete Section"
+                          title="Delete Section"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
 
               {/* Task rows */}
               {!isCollapsed && (

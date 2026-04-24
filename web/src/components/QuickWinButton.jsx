@@ -9,6 +9,8 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
+import { burstConfetti } from '../utils/confetti';
+import { playQuickWin } from '../utils/sounds';
 import './QuickWinButton.css';
 
 const STREAK_MESSAGES = [
@@ -23,42 +25,10 @@ function getStreakMessage(streak) {
   return STREAK_MESSAGES[Math.max(0, idx)];
 }
 
-function ConfettiParticle({ color, left, delay, duration }) {
-  return (
-    <div
-      className="confetti-particle"
-      style={{
-        backgroundColor: color,
-        left: `${left}%`,
-        animationDelay: `${delay}ms`,
-        animationDuration: `${duration}ms`,
-      }}
-      aria-hidden="true"
-    />
-  );
-}
-
-const CONFETTI_COLORS = [
-  '#ff6b6b', '#4ecdc4', '#a78bfa', '#fbbf24', '#34d399',
-  '#f7a26a', '#60a5fa', '#f472b6',
-];
-
-function generateConfetti(count = 24) {
-  return Array.from({ length: count }, (_, i) => ({
-    id: i,
-    color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-    left: Math.random() * 100,
-    delay: Math.random() * 300,
-    duration: 600 + Math.random() * 600,
-  }));
-}
-
 export function QuickWinButton({ onGetQuickWin, onCompleteTask, quickWinStreak }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
-  const [showConfetti, setShowConfetti] = useState(false);
   const [showMomentum, setShowMomentum] = useState(false);
-  const [confettiParticles, setConfettiParticles] = useState([]);
   const modalRef = useRef(null);
 
   function handleOpen() {
@@ -69,7 +39,6 @@ export function QuickWinButton({ onGetQuickWin, onCompleteTask, quickWinStreak }
     } else {
       setCurrentTask(task);
     }
-    setShowConfetti(false);
     setShowMomentum(false);
     setModalOpen(true);
   }
@@ -80,18 +49,17 @@ export function QuickWinButton({ onGetQuickWin, onCompleteTask, quickWinStreak }
 
     // Intensity scales with streak (gamification_logic.md)
     const intensity = Math.min(quickWinStreak + 1, 4);
-    const particleCount = 16 + intensity * 8;
-    setConfettiParticles(generateConfetti(particleCount));
-    setShowConfetti(true);
+    
+    // Canvas burst + audio chime
+    burstConfetti({ intensity });
+    playQuickWin(quickWinStreak);
+    
     setShowMomentum(true);
-
-    setTimeout(() => setShowConfetti(false), 1200);
   }
 
   function handleGetAnother() {
     const task = onGetQuickWin();
     setCurrentTask(task);
-    setShowConfetti(false);
     setShowMomentum(false);
   }
 
@@ -152,15 +120,6 @@ export function QuickWinButton({ onGetQuickWin, onCompleteTask, quickWinStreak }
           aria-labelledby="qw-modal-title"
         >
           <div className="qw-modal" ref={modalRef}>
-            {/* Confetti */}
-            {showConfetti && (
-              <div className="qw-modal__confetti" aria-hidden="true">
-                {confettiParticles.map((p) => (
-                  <ConfettiParticle key={p.id} {...p} />
-                ))}
-              </div>
-            )}
-
             {/* Close button */}
             <button
               id="qw-modal-close"
@@ -187,7 +146,7 @@ export function QuickWinButton({ onGetQuickWin, onCompleteTask, quickWinStreak }
                     <div className="qw-modal__task-card">
                       <span className="qw-modal__task-emoji" aria-hidden="true">✅</span>
                       <div className="qw-modal__task-info">
-                        <span className="qw-modal__task-name">{currentTask.title}</span>
+                        <span className="qw-modal__task-name">{currentTask.name}</span>
                         {currentTask.estimatedDurationMinutes && (
                           <span className="qw-modal__task-duration">
                             ~{currentTask.estimatedDurationMinutes} min

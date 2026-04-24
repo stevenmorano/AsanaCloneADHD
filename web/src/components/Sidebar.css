@@ -149,3 +149,10 @@
   border-radius: 50%;
   flex-shrink: 0;
 }
+
+/* ── Bottom Section ── */
+.sidebar__section--bottom {
+  margin-top: auto;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 12px;
+}

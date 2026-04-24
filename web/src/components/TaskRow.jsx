@@ -19,8 +19,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getProject } from '../data/projects';
 import { formatDueDate, getDueDateStatus } from '../hooks/useAppState';
 import { humanizeRecurrence } from '../utils/recurrenceUtils';
+import { burstConfetti } from '../utils/confetti';
+import { playQuickWin, playCompletion } from '../utils/sounds';
 import { DatePickerPopover } from './DatePickerPopover';
 import { InlineDropdown  } from './InlineDropdown';
+import { ReclaimSyncModal } from './ReclaimSyncModal';
 import './TaskRow.css';
 
 /* ── helpers ── */
@@ -57,7 +60,7 @@ export function TaskRow({
 }) {
   const {
     id, name, projectId, sectionId, dueDate, tags = [], priority,
-    isQuickWin, recurrence, healthPercentage, completed, isNew,
+    isQuickWin, recurrence, healthPercentage, completed, isNew, type,
   } = task;
 
   /* ── spawn animation ── */
@@ -71,13 +74,22 @@ export function TaskRow({
   }, [isNew, id, onClearNew]);
 
   /* ── checkbox / completion ── */
+  const checkBtnRef = useRef(null);
   const [shattering, setShattering] = useState(false);
   function handleCheck() {
     if (completed || shattering) return;
     if (isQuickWin) {
+      // Get position for confetti burst
+      const rect = checkBtnRef.current?.getBoundingClientRect();
+      const x = rect ? rect.left + rect.width  / 2 : window.innerWidth  / 2;
+      const y = rect ? rect.top  + rect.height / 2 : window.innerHeight / 2;
       setShattering(true);
+      // Fire effects immediately so they feel instantaneous
+      burstConfetti({ x, y, intensity: 1 });
+      playQuickWin(0);
       setTimeout(() => { setShattering(false); onComplete(id); }, 420);
     } else {
+      playCompletion();
       onComplete(id);
     }
   }
@@ -168,6 +180,33 @@ export function TaskRow({
     if (!tags.includes(newTag)) onUpdate?.(id, { tags: [...tags, newTag] });
   }
 
+  /* ── type toggle & reclaim sync ── */
+  const [showReclaimModal, setShowReclaimModal] = useState(false);
+
+  function handleTypeToggle(e) {
+    e.stopPropagation();
+    if (type === 'time_block') {
+      // Revert back to a quick chore
+      onUpdate?.(id, { type: 'quick_chore' });
+    } else {
+      // Prompt for Reclaim settings before making it a time block
+      setShowReclaimModal(true);
+    }
+  }
+
+  function handleReclaimSubmit(formData) {
+    // Basic mapping of Reclaim form data into our local state schema
+    // In a real app we would hit the Reclaim.ai API here.
+    onUpdate?.(id, { 
+      type: 'time_block',
+      dueDate: formData.earliestDate || dueDate, // Update date if selected
+      priority: formData.priority.includes('High') ? 'High' : 
+                formData.priority.includes('Medium') ? 'Medium' : 
+                formData.priority.includes('Low') ? 'Low' : priority
+    });
+    setShowReclaimModal(false);
+  }
+
   /* ── derived display values ── */
   const project        = getProject(projectId);
   const currentProject = useMemo(() => projects.find((p) => p.id === projectId), [projects, projectId]);
@@ -221,6 +260,7 @@ export function TaskRow({
 
       {/* ── Checkbox ── */}
       <button
+        ref={checkBtnRef}
         id={`check-${id}`}
         className={[
           'task-row__check',
@@ -375,6 +415,23 @@ export function TaskRow({
         )}
       </div>
 
+      {/* ── Type (toggle) ── */}
+      <div className="task-row__type-cell">
+        <button
+          className={`task-row__type-btn ${type === 'time_block' ? 'task-row__type-btn--block' : 'task-row__type-btn--chore'}`}
+          onClick={handleTypeToggle}
+          title={type === 'time_block' ? 'Time Block (Syncs to Calendar)' : 'Quick Chore (Stays in-app)'}
+          aria-label={`Current type: ${type === 'time_block' ? 'Time Block' : 'Quick Chore'}. Click to toggle.`}
+        >
+          <span className="task-row__type-icon" aria-hidden="true">
+            {type === 'time_block' ? '📅' : '🧹'}
+          </span>
+          <span className="task-row__type-label">
+            {type === 'time_block' ? 'Block' : 'Chore'}
+          </span>
+        </button>
+      </div>
+
       {/* ── Priority ── */}
       <div className="task-row__priority">
         {priority && PRIORITY_CONFIG[priority] && (
@@ -429,6 +486,13 @@ export function TaskRow({
           multiSelect={true}
           searchPlaceholder="Filter or create tag…"
           emptyText="No tags yet — type to create one"
+        />
+      )}
+      {showReclaimModal && (
+        <ReclaimSyncModal 
+          task={task}
+          onClose={() => setShowReclaimModal(false)}
+          onSubmit={handleReclaimSubmit}
         />
       )}
     </div>
